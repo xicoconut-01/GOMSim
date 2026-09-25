@@ -1,0 +1,34 @@
+# SYNTHETIC reference section used to verify the models in phase 6.
+# It is NOT the real Lakeshore corridor. Real chainages, speed limits and gradients
+# come from the OSM -> RailJSON infrastructure used in OSRD (ASM-11) and replace this file later.
+
+reference_section:
+  description: "Synthetic 5-station commuter section with one speed restriction"
+  stations:            # position_m, dwell_s (Local stopping pattern placeholder, OPEN-03)
+    - {name: A, position_m: 0,     dwell_s: 0}
+    - {name: B, position_m: 4000,  dwell_s: 60}
+    - {name: C, position_m: 7500,  dwell_s: 60}
+    - {name: D, position_m: 12500, dwell_s: 60}
+    - {name: E, position_m: 18500, dwell_s: 0}
+  speed_limits:        # [start_m, end_m, limit_kmh]
+    - [0,     9000,  145]
+    - [9000,  10500, 80]
+    - [10500, 18500, 145]
+  gradients:           # [start_m, end_m, gradient_permille] (+ = uphill)
+    - [0,     18500, 0]
+
+signalling:
+  fixed_block:
+    trace: [ASM-12]              # model-only: OSRD approximation of the existing fixed block
+    block_length_m: 1500
+    overlap_m: 200
+    route_setting_and_sighting_s: 15
+  moving_block:
+    trace: [SYS-TC-02, OI-02, SYS-PRF-02, ASM-12]
+    safety_margin_m: 50           # model assumption (ASM-12)
+    accuracy_abs_m: 3             # OI-02
+    accuracy_rel: 0.02            # OI-02: 2 % of distance since last transponder
+    transponder_spacing_m: 300    # OI-02: transponders at no more than 300 m
+    report_interval_s: 0.5        # OI-02: position reporting interval <= 500 ms
+    comm_latency_s: 0.2           # SYS-PRF-02: 200 ms end-to-end at the 95th percentile
+    system_processing_s: 3        # model assumption (ASM-12)

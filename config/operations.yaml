@@ -1,0 +1,54 @@
+# Operating and incident parameters for the S3 delay-propagation model (Module 3).
+# Corridor is an equal-spacing APPROXIMATION of Hamilton GO Centre - Union - Oshawa GO (ASM-15);
+# real station positions come from the OSRD infrastructure in phase 9.
+
+corridor:
+  trace: [OI-08, ASM-15]         # OI-08: Hamilton GO Centre - Union - Oshawa GO scope
+  lakeshore_west_km: 64.2      # Union - Hamilton (Transit Toronto)
+  lakeshore_west_sections: 11  # Local stops, equal spacing (approximation)
+  lakeshore_east_km: 50.1      # Union - Oshawa (Transit Toronto)
+  lakeshore_east_sections: 9   # Danforth ... Whitby, Oshawa
+  line_speed_kmh: 145
+  intermediate_dwell_s: 60
+
+scenarios:
+  S1:
+    train: S1_diesel_pushpull
+    signalling: fixed
+    headway_min: [30, 15]        # OPEN-02 / OI-08: S1 baseline must come from a dated timetable -> both run
+    union_dwell_scheduled_s: 1800   # ASM-06
+    union_dwell_min_s: 600          # OPEN-05 placeholder: minimum Union work time
+    terminal_turnback_min_s: 600    # OPEN-04 placeholder (push-pull, change ends)
+    incident:
+      type: "Level-crossing incident"
+      trace: [ASM-16, ASM-18]
+  S2:
+    train: S2_bilevel_emu
+    signalling: moving
+    headway_min: [15]               # OI-08: 15-min two-way all-day target
+    union_dwell_scheduled_s: 60
+    union_dwell_min_s: 60
+    terminal_turnback_min_s: 300    # OPEN-04 placeholder (EMU, change ends)
+    incident:
+      type: "Foreign object on overhead contact system"
+      trace: [ASM-17, ASM-18]
+
+incident:                        # common to both scenarios for comparability (ASM-18)
+  section_index_from_hamilton: 5   # 6th Lakeshore West section, mid-way Hamilton - Union
+  start_after_first_departure_min: 90
+  duration_min: 30
+  blocks_both_directions: true
+
+simulation:
+  window_hours: 6
+  punctuality_threshold_min: 5
+
+passengers:                      # Module 3 KPI: weighted passenger delay (OI-12, SYS-SUP-04)
+  trace: [OI-12, SYS-SUP-04, ASM-19]
+  load_per_trip: 400             # ASM-19: average off-peak load per trip, same for every trip
+  union_alighting_share: 0.5     # ASM-19: share of each trip's passengers alighting at Union
+  union_connecting_share: 0.6    # ASM-19: share of Union alighters who connect onward
+  weight_connecting: 1.5         # OI-12
+  weight_last_service: 2.0       # OI-12
+  weight_default: 1.0
+  last_service_trips: []         # OI-12 weight applies only when the window contains last services

@@ -1,0 +1,22 @@
+id,layer,description,model,parameters_from,doors_object,relation,status
+UT-01,Model verification,EBD distance equals v^2/(2b),braking.py,ASM-08;ASM-09,SYS-TC-04,Concept support only - TC-TC-02 is a bench test and is not replaced by simulation,Pass
+UT-02,Model verification,Supervision curves ordered EBD<EBI<SBI<Permitted,braking.py,ASM-08;ASM-09,SYS-TC-04;OI-06,Concept support; braking curves are the input OI-06 needs for degraded-mode speed limits,Pass
+UT-03,Model verification,Speed never exceeds line limit or train maximum,dynamics.py,ASM-10,-,Model verification only,Pass
+UT-04,Model verification,Train stops at every station,dynamics.py,ASM-15,-,Model verification only,Pass
+UT-05,Model verification,Running time above physical lower bound,dynamics.py,-,-,Model verification only,Pass
+UT-06,Model verification,Moving-block headway <= fixed-block headway,headway.py,OI-02;SYS-PRF-02;ASM-12,SYS-TC-02,Supports TC-TC-07 precondition (validated simulation model),Pass
+UT-07,Model verification,Station headway grows one-for-one with dwell,headway.py,ASM-06,SYS-PRF-03,Supports TC-TC-07 precondition,Pass
+UT-08,Model verification,Platform demand = ceil(station headway / service headway),headway.py,OI-08,SYS-PRF-03,Supports TC-TC-07 precondition,Pass
+UT-09,Model verification,No incident: every trip runs exactly to schedule,propagation.py,ASM-15,-,Model verification only,Pass
+UT-10,Model verification,Delay bounded by blockage plus headway knock-on,propagation.py,ASM-18,SYS-SUP-04,Supports TC-SUP-01 precondition (defined disruption scenario set),Pass
+UT-11,Model verification,No overtaking within a direction,propagation.py,ASM-04,-,Model verification only,Pass
+UT-12,Model verification,Union slack recovers up to scheduled minus minimum dwell,propagation.py,ASM-06;OPEN-05,-,Model verification only,Pass
+UT-13,Model verification,Padded timetable runs to time without incident,propagation.py,OPEN-04;OPEN-05,-,Model verification only,Pass
+UT-14,Model verification,Fleet size equals cycle time / headway,propagation.py,OPEN-04,-,Model verification only,Pass
+UT-15,Model verification,Reporting interval never shortens headway; OI-02 two-train uncertainty = 18 m,headway.py,OI-02,SYS-TC-01;SYS-TC-02,Confirms OI-02 values are implemented as specified,Pass
+UT-16,Model verification,OI-12 weights applied correctly (connecting 1.5; last service 2.0),passengers.py,OI-12;ASM-19,SYS-SUP-04,Confirms the ranking criterion is implemented as specified,Pass
+SIM-01,Requirement evidence,Fixed vs moving block headway comparison (S1a vs S2),run_phase6.py,OI-02;SYS-PRF-02,TC-TC-07 -> SYS-TC-02;SYS-PRF-03,Preliminary result on a synthetic section; final evidence needs the OSRD corridor (phase 9),Preliminary
+SIM-02,Requirement evidence,S3 disruption scenario set: level-crossing (S1) and OCS foreign object (S2); 30-min blockage,run_module3.py,OI-12;ASM-16;ASM-17;ASM-18,TC-SUP-01 -> SYS-SUP-03;SYS-SUP-04,Provides the scenario set and the OI-12 KPI; detection within 10 s and proposal generation are outside the model,Preliminary
+SIM-03,Requirement evidence,S2 recovery-time options ranked by weighted passenger delay,run_recovery_s2.py,OI-12;OPEN-04,SYS-SUP-04,Supporting analysis; no SRS requirement currently covers timetable robustness (candidate new requirement),Preliminary
+SIM-04,Requirement evidence,Load-profile calibration for the test bench (12 trains/h/direction),-,OI-15,TC-AM-08;TC-PRF-01,Planned - OI-15 states the profile should be calibrated by simulation,Planned
+SIM-05,Requirement evidence,Degraded-mode speed limits from braking performance,-,OI-06,SYS-DEG-01;TC-SUP-03,Planned - uses braking.py,Planned
