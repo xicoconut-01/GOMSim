@@ -9,7 +9,8 @@ its inbound set has arrived and completed the minimum turnback (OPEN-04).
 
 An incident blocks one section in both directions for a fixed duration:
   - a train that would enter the section while it is blocked waits at the previous station;
-  - a train already inside the section when it becomes blocked is stopped for the remaining duration.
+  - a train already inside the section when it becomes blocked brakes to a stand, waits, and restarts from
+    standstill; the braking and restart cost `stop_penalty_s` of the section on top of the waiting time (CR-014).
 """
 from dataclasses import dataclass, field
 
@@ -23,6 +24,7 @@ class Route:
     km: list[float]
     run_s: list[float]           # eastbound section running time, section j = station j -> j+1
     union_idx: int
+    stop_penalty_s: list[float] | None = None   # extra time of an unplanned stop inside section j (CR-014)
 
 
 @dataclass
@@ -64,7 +66,21 @@ def build_route(train: Train, lw_km: float, lw_n: int, le_km: float, le_n: int,
     names = (["Hamilton GO Centre"] + [f"LW{lw_n - i}" for i in range(1, lw_n)] + ["Union"]
              + [f"LE{i}" for i in range(1, le_n)] + ["Oshawa GO"])
     t_lw, t_le = section_time(lw_d), section_time(le_d)
-    return Route(names, km, [t_lw] * lw_n + [t_le] * le_n, union_idx=lw_n)
+    pen_lw, pen_le = (section_stop_penalty(train, lw_d * 1000, line_speed_kmh),
+                      section_stop_penalty(train, le_d * 1000, line_speed_kmh))
+    return Route(names, km, [t_lw] * lw_n + [t_le] * le_n, union_idx=lw_n,
+                 stop_penalty_s=[pen_lw] * lw_n + [pen_le] * le_n)
+
+
+def section_stop_penalty(train: Train, length_m: float, line_speed_kmh: float, limits=None,
+                         driver_margins_m=(0.0, 0.0)) -> float:
+    """Time lost by an unplanned stop in the middle of a section (braking to a stand, restarting), no dwell."""
+    lim = limits or [[0, length_m, line_speed_kmh]]
+    def t(stops):
+        st = [{"name": f"s{i}", "position_m": x, "dwell_s": 0} for i, x in enumerate(stops)]
+        return run_time(train, Corridor(st, lim, [[0, length_m, 0]]), ds=2.0,
+                        driver_margins_m=driver_margins_m).total_running_s
+    return t([0.0, length_m / 2, length_m]) - t([0.0, length_m])
 
 
 def _schedule(route: Route, direction: str, t0: float, dwell_s: float, union_dwell_s: float,
@@ -144,6 +160,8 @@ def simulate(route: Route, trips: list[Trip], incident: Incident | None, min_dwe
                     tr.stopped_in_section = (k, (incident.start_s - dep) / run,
                                              incident.start_s, incident.end_s)
                     run += incident.end_s - incident.start_s  # stopped inside the section
+                    if route.stop_penalty_s:
+                        run += route.stop_penalty_s[sec]      # braking to a stand and restarting
             tr.dep.append(dep)
             arr = dep + run
             if prev is not None:

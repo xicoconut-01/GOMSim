@@ -1,0 +1,18 @@
+LEG ('Toronto Union Station', 'Danforth', 8917.999999999993, 8926.782576743866)
+total abs err 13.4 segments 323
+path 111778 m; facing signals 72 ; detectors 144
+block length median 548.0 max 7206.0
+Minimum headway (blocking time, BAL, real signals): 580 s = 9.7 min
+  zone   86.05-  86.55 km (near Guildwood), warning signal at 78.85 km:   580 s
+  zone   78.85-  86.05 km (near Scarborough), warning signal at 78.65 km:   568 s
+  zone   47.12-  51.09 km (near Long Branch), warning signal at 43.16 km:   464 s
+  zone   91.84-  97.12 km (near Rouge Hill), warning signal at 86.55 km:   439 s
+  zone   66.09-  67.36 km (near Toronto Union Station), warning signal at 65.35 km:   409 s
+  zone  103.33- 103.80 km (near Ajax), warning signal at 98.77 km:   395 s
+Moving block minimum headway: 174 s at 64.7 km (near Toronto Union Station )
+
+Sensitivity: uniform block length instead of generated signals
+   3000 m blocks: H_fixed   749 s (near Exhibition) -> reduction vs moving block   77 %
+   2000 m blocks: H_fixed   672 s (near Toronto Union Station) -> reduction vs moving block   74 %
+   1500 m blocks: H_fixed   564 s (near Toronto Union Station) -> reduction vs moving block   69 %
+   1000 m blocks: H_fixed   493 s (near Toronto Union Station) -> reduction vs moving block   65 %

@@ -1,4 +1,5 @@
 """Unit verification of the phase-6 models. Test IDs (UT-xx) are listed in docs/traceability.csv."""
+import dataclasses
 import math
 import sys
 from pathlib import Path
@@ -170,3 +171,49 @@ def test_ut16_weighted_passenger_delay():
     late = [t.tid for t in trips if t.delay_at_destination_s > 0]
     last = weighted_passenger_delay_min(route, trips, PassengerModel(400, 0.5, 0.0, last_service_trips=tuple(late)))
     assert last == pytest.approx(2.0 * base)
+
+
+def test_ut17_driver_margins():
+    """UT-17: With driver margins (100 m, 50 m) a lower limit is respected 100 m before it starts and
+    held until 50 m after it ends (lineside-signalling driver, CR-012); (0, 0) reproduces the old profile."""
+    from golsim.dynamics import Corridor
+    c = Corridor([{"name": "A", "position_m": 0, "dwell_s": 0}, {"name": "B", "position_m": 6000, "dwell_s": 0}],
+                 [[0, 3000, 120], [3000, 3500, 40], [3500, 6000, 120]], [[0, 6000, 0]])
+    tr = dataclasses.replace(TRAINS["S1_diesel_pushpull"], length_m=1.0)
+    with_m = run_time(tr, c, ds=1.0, driver_margins_m=(100.0, 50.0))
+    without = run_time(tr, c, ds=1.0)
+    assert with_m.v[2900] <= 40 / 3.6 + 1e-6 and with_m.v[3549] <= 40 / 3.6 + 1e-6
+    assert without.v[2900] > 40 / 3.6
+    assert with_m.total_running_s > without.total_running_s
+
+
+def test_ut18_buffer_stop_approach():
+    """UT-18: Into a buffer stop the train runs at no more than 10 km/h over the last 100 m (driver rule, CR-013)."""
+    from golsim.dynamics import Corridor, buffer_stop_approach_limits
+    lim = [[0, 3000, 100]] + buffer_stop_approach_limits(3000)
+    c = Corridor([{"name": "A", "position_m": 0, "dwell_s": 0}, {"name": "B", "position_m": 3000, "dwell_s": 0}],
+                 lim, [[0, 3000, 0]])
+    r = run_time(TRAINS["S1_diesel_pushpull"], c, ds=1.0)
+    assert r.v[2900:3000].max() <= 10 / 3.6 + 1e-6 and r.v[2800:2900].max() <= 30 / 3.6 + 1e-6
+
+
+def test_ut19_incident_stop_is_a_real_stop():
+    """UT-19: A train caught inside the blocked section brakes to a stand beyond its position at the incident
+    start and loses time restarting from standstill, compared with a pure pause (CR-014)."""
+    import numpy as np
+    from golsim.blocking import Profile, TrainRun, apply_incident
+    from golsim.dynamics import Corridor
+    tr = TRAINS["S2_bilevel_emu"]
+    def mk(extra=None):
+        st = [{"name": "A", "position_m": 0, "dwell_s": 0}, {"name": "B", "position_m": 8000, "dwell_s": 0}]
+        if extra is not None:
+            st.insert(1, {"name": "incident stop", "position_m": extra, "dwell_s": 0})
+        r = run_time(tr, Corridor(st, [[0, 8000, 140]], [[0, 8000, 0]]), ds=1.0)
+        n = len(st)
+        return Profile(r.t, [s["position_m"] for s in st], [0.0] * n, [0.0] * n, tr.length_m, r.v)
+    base = mk()
+    paused = apply_incident(TrainRun("p", 0.0), base, 0, 120.0, 720.0)
+    real = apply_incident(TrainRun("r", 0.0), base, 0, 120.0, 720.0, make_profile=mk, service_decel=tr.service_decel)
+    pos_at_w0 = paused.section_holds[0][0]
+    assert real.incident_stop[0] > pos_at_w0
+    assert real.arr[-1] > paused.arr[-1] + 10   # braking and restarting cost time
