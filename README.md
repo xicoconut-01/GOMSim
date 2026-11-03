@@ -38,15 +38,20 @@ section and the equal-spacing corridor; they are kept for traceability and super
 
 ## Key results (v0.3)
 
-- Journey Hamilton GO Centre – Oshawa GO: 149.6 min (S1) → 102.9 min (S2); Union operation −29.0, rolling stock −16.0, CBTC with ATO −1.6 min.
-- Minimum headway: fixed block 580 s → moving block 174 s (−70 %; −65 to −77 % with 1–3 km blocks). TC-TC-07 passed.
-- 30-min incident at Oakville–Clarkson, 15-min service: S2 44k weighted passenger-minutes on 16 sets; the realistic S1 (5-min Union dwell) 89k on 20 sets with comparable terminal slack.
+- Journey Hamilton GO Centre – Oshawa GO against a realistic baseline (5-min Union dwell, as in GO's current schedule, S1-5): 124.6 min → 102.9 min (S2); rolling stock −16.0, Union dwell 5 → 1 min −4.0, CBTC with ATO −1.6 min. The original brief assumed a 30-min Union dwell (S1, ASM-06), which gives 149.6 min and overstates the Union saving (−29.0 min); it is kept as a controlled baseline (CR-011).
+- Signalling adds little journey time but a lot of capacity. Minimum headway on the same EMU: fixed block 580 s → moving block 174 s (−70 %; −65 to −77 % with 1–3 km blocks). TC-TC-07 passed.
+- 30-min incident at Oakville–Clarkson, 15-min service: S2 44k weighted passenger-minutes on 16 sets; the realistic S1-5 with comparable terminal slack 40–49k on 20 sets with 1–2 km blocks (89k on the sparse generated signals). Disruption impact is comparable; S2's advantages are capacity and four fewer train sets.
 
 ## Known limitations
 
 - Signals are generated from OpenStreetMap and are sparser than on the real corridor (ASM-11); fixed-block results are shown with a uniform-block sensitivity.
+- Level track: the OpenStreetMap infrastructure carries no gradient or curve data, so golsim and OSRD both run on 0 ‰ (ASM-26). The OSRD cross-validation checks the calculation on identical inputs, not real-world running times.
+- Not calibrated against actual train performance. Running times are 14–15 % (Lakeshore East Local) to 21–25 % (Lakeshore West Local) shorter than GO's current timetable for the closest comparable services.
+- Rolling-stock performance values are estimates from public specifications (ASM-25); passenger values are assumptions (ASM-19).
 - Union station: missing platform detectors and a route data defect in the imported infrastructure (ASM-22); Union-internal thresholds are not validated.
-- Westbound running times assumed equal to eastbound in Module 3 (ASM-23); rolling-stock and passenger values are assumptions (ASM-08, ASM-09, ASM-19).
+- Westbound running times assumed equal to eastbound in Module 3 (ASM-23).
+
+All assumptions, open items and changes are listed in [`docs/assumptions.md`](docs/assumptions.md).
 
 ## Data
 
