@@ -1,17 +1,17 @@
 # Rolling stock parameters for GO Modernization simulation.
 # EVERY value here is an assumption unless a source is given.
-# Trace: ASM-08 (S1 traction), ASM-09 (S2 EMU parameters), OPEN-01 (consist), OPEN-06 (EMU dynamics).
+# Trace: ASM-08 (S1 locomotive type), ASM-09 (S2 EMU), ASM-25 (performance values are estimates), OPEN-01 (consist), OPEN-06 (EMU dynamics).
 # Braking values feed the ATP curves that OI-06 needs for degraded-mode speed limits (SIM-05, planned).
 # Replace values when better data is available and re-baseline (see docs/assumptions.md).
 
 S1_diesel_pushpull:
   description: "MP40PHT-T4AC (MP54AC) diesel-electric loco + 12 BiLevel coaches incl. cab car, push-pull"
-  trace: [ASM-07, ASM-08, OPEN-01]
+  trace: [ASM-07, ASM-08, ASM-25, OPEN-01]
   length_m: 333            # ~21 m loco + 12 x ~26 m coaches (approximate)
   mass_t: 790              # ~130 t loco + 12 x ~55 t loaded coaches (approximate)
   rotating_mass_factor: 1.06
   max_tractive_effort_kN: 330
-  traction_power_kW: 3200  # power at rail, approximate
+  traction_power_kW: 3200  # power at rail, approximate; to be checked against MP40PH-3C / MP54AC (ASM-25)
   max_speed_kmh: 150       # ~93 mph locomotive design speed
   davis_A_kN: 6.0          # R = A + B*v + C*v^2, v in m/s
   davis_B_kN_per_mps: 0.15
@@ -27,7 +27,7 @@ S1_diesel_pushpull:
 
 S2_bilevel_emu:
   description: "Bi-level EMU, 12-car equivalent capacity, design max speed 210 km/h"
-  trace: [ASM-09, ASM-10, OPEN-01, OPEN-06]
+  trace: [ASM-09, ASM-10, ASM-25, OPEN-01, OPEN-06]
   length_m: 320
   mass_t: 700
   rotating_mass_factor: 1.08
